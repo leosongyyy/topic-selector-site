@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>选题情报台 - 远的AI学习圈</title>
     <style>
-        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        :root {{
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
             --must-write: #e74c3c;
             --pending: #f39c12;
             --not-suit: #95a5a6;
@@ -19,48 +19,48 @@
             --score-high: #10b981;
             --score-mid: #f59e0b;
             --score-low: #ef4444;
-        }}
-        body {{
+        }
+        body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
             background: var(--bg);
             color: var(--text-primary);
             min-height: 100vh;
             line-height: 1.6;
-        }}
-        .container {{ max-width: 1200px; margin: 0 auto; padding: 20px; }}
-        .header {{
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header {
             background: linear-gradient(135deg, #1a1d28 0%, #2a1d3a 100%);
             border: 1px solid var(--card-border);
             border-radius: 16px;
             padding: 32px;
             margin-bottom: 24px;
-        }}
-        .header h1 {{ font-size: 28px; font-weight: 700; margin-bottom: 8px; }}
-        .header h1 span {{ color: var(--accent); }}
-        .header .meta {{ display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }}
-        .meta-item {{
+        }
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .header h1 span { color: var(--accent); }
+        .header .meta { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+        .meta-item {
             background: rgba(99,102,241,0.15);
             border: 1px solid rgba(99,102,241,0.3);
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 13px;
             color: #a5b4fc;
-        }}
-        .stats-row {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }}
-        .stat-card {{
+        }
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 20px;
             text-align: center;
-        }}
-        .stat-card .number {{ font-size: 36px; font-weight: 800; }}
-        .stat-card .label {{ font-size: 13px; color: var(--text-secondary); margin-top: 4px; }}
-        .stat-must .number {{ color: var(--must-write); }}
-        .stat-pending .number {{ color: var(--pending); }}
-        .stat-not .number {{ color: var(--not-suit); }}
-        .stat-total .number {{ color: var(--accent); }}
-        .filter-bar {{
+        }
+        .stat-card .number { font-size: 36px; font-weight: 800; }
+        .stat-card .label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+        .stat-must .number { color: var(--must-write); }
+        .stat-pending .number { color: var(--pending); }
+        .stat-not .number { color: var(--not-suit); }
+        .stat-total .number { color: var(--accent); }
+        .filter-bar {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 12px;
@@ -70,9 +70,9 @@
             gap: 10px;
             flex-wrap: wrap;
             align-items: center;
-        }}
-        .filter-bar .label {{ font-size: 14px; color: var(--text-secondary); margin-right: 4px; }}
-        .filter-btn {{
+        }
+        .filter-bar .label { font-size: 14px; color: var(--text-secondary); margin-right: 4px; }
+        .filter-btn {
             padding: 6px 16px;
             border-radius: 20px;
             border: 1px solid var(--card-border);
@@ -81,16 +81,16 @@
             cursor: pointer;
             font-size: 13px;
             transition: all 0.2s;
-        }}
-        .filter-btn:hover {{ border-color: var(--accent); color: var(--text-primary); }}
-        .filter-btn.active {{ background: var(--accent); border-color: var(--accent); color: white; }}
-        .filter-btn.active-must {{ background: var(--must-write); border-color: var(--must-write); color: white; }}
-        .filter-btn.active-pending {{ background: var(--pending); border-color: var(--pending); color: white; }}
-        .filter-btn.active-not {{ background: var(--not-suit); border-color: var(--not-suit); color: white; }}
-        .filter-btn.active-cat {{ background: #06b6d4; border-color: #06b6d4; color: white; }}
-        .cat-filters {{ display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }}
-        .topics-grid {{ display: grid; gap: 16px; }}
-        .topic-card {{
+        }
+        .filter-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+        .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .filter-btn.active-must { background: var(--must-write); border-color: var(--must-write); color: white; }
+        .filter-btn.active-pending { background: var(--pending); border-color: var(--pending); color: white; }
+        .filter-btn.active-not { background: var(--not-suit); border-color: var(--not-suit); color: white; }
+        .filter-btn.active-cat { background: #06b6d4; border-color: #06b6d4; color: white; }
+        .cat-filters { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+        .topics-grid { display: grid; gap: 16px; }
+        .topic-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 12px;
@@ -99,89 +99,89 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
-        }}
-        .topic-card::before {{
+        }
+        .topic-card::before {
             content: '';
             position: absolute;
             left: 0; top: 0; bottom: 0;
             width: 4px;
-        }}
-        .topic-card.must::before {{ background: var(--must-write); }}
-        .topic-card.pending::before {{ background: var(--pending); }}
-        .topic-card.not-suit::before {{ background: var(--not-suit); }}
-        .topic-card:hover {{
+        }
+        .topic-card.must::before { background: var(--must-write); }
+        .topic-card.pending::before { background: var(--pending); }
+        .topic-card.not-suit::before { background: var(--not-suit); }
+        .topic-card:hover {
             border-color: var(--accent);
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-        }}
-        .topic-header {{
+        }
+        .topic-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 12px;
             gap: 16px;
-        }}
-        .topic-title {{ font-size: 17px; font-weight: 600; line-height: 1.4; flex: 1; }}
-        .topic-badges {{ display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }}
-        .badge {{
+        }
+        .topic-title { font-size: 17px; font-weight: 600; line-height: 1.4; flex: 1; }
+        .topic-badges { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
+        .badge {
             padding: 3px 10px;
             border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
             white-space: nowrap;
-        }}
-        .badge-must {{ background: rgba(231,76,60,0.2); color: #f87171; border: 1px solid rgba(231,76,60,0.3); }}
-        .badge-pending {{ background: rgba(243,156,18,0.2); color: #fbbf24; border: 1px solid rgba(243,156,18,0.3); }}
-        .badge-not {{ background: rgba(149,165,166,0.2); color: #bdc3c7; border: 1px solid rgba(149,165,166,0.3); }}
-        .badge-cat {{ background: rgba(6,182,212,0.15); color: #67e8f9; border: 1px solid rgba(6,182,212,0.3); }}
-        .badge-hot {{ background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }}
-        .score-row {{ display: flex; gap: 16px; margin: 12px 0; flex-wrap: wrap; }}
-        .score-item {{ display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }}
-        .score-bar-bg {{ width: 60px; height: 6px; background: #2a2d3a; border-radius: 3px; overflow: hidden; }}
-        .score-bar {{ height: 100%; border-radius: 3px; transition: width 0.5s; }}
-        .score-bar.high {{ background: var(--score-high); }}
-        .score-bar.mid {{ background: var(--score-mid); }}
-        .score-bar.low {{ background: var(--score-low); }}
-        .total-score {{
+        }
+        .badge-must { background: rgba(231,76,60,0.2); color: #f87171; border: 1px solid rgba(231,76,60,0.3); }
+        .badge-pending { background: rgba(243,156,18,0.2); color: #fbbf24; border: 1px solid rgba(243,156,18,0.3); }
+        .badge-not { background: rgba(149,165,166,0.2); color: #bdc3c7; border: 1px solid rgba(149,165,166,0.3); }
+        .badge-cat { background: rgba(6,182,212,0.15); color: #67e8f9; border: 1px solid rgba(6,182,212,0.3); }
+        .badge-hot { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+        .score-row { display: flex; gap: 16px; margin: 12px 0; flex-wrap: wrap; }
+        .score-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+        .score-bar-bg { width: 60px; height: 6px; background: #2a2d3a; border-radius: 3px; overflow: hidden; }
+        .score-bar { height: 100%; border-radius: 3px; transition: width 0.5s; }
+        .score-bar.high { background: var(--score-high); }
+        .score-bar.mid { background: var(--score-mid); }
+        .score-bar.low { background: var(--score-low); }
+        .total-score {
             font-size: 20px; font-weight: 800; min-width: 52px;
             text-align: center; padding: 4px 8px; border-radius: 8px; flex-shrink: 0;
-        }}
-        .total-score.high {{ color: var(--score-high); background: rgba(16,185,129,0.1); }}
-        .total-score.mid {{ color: var(--score-mid); background: rgba(245,158,11,0.1); }}
-        .total-score.low {{ color: var(--score-low); background: rgba(239,68,68,0.1); }}
-        .topic-detail {{
+        }
+        .total-score.high { color: var(--score-high); background: rgba(16,185,129,0.1); }
+        .total-score.mid { color: var(--score-mid); background: rgba(245,158,11,0.1); }
+        .total-score.low { color: var(--score-low); background: rgba(239,68,68,0.1); }
+        .topic-detail {
             display: none;
             margin-top: 16px;
             padding-top: 16px;
             border-top: 1px solid var(--card-border);
-        }}
-        .topic-card.expanded .topic-detail {{ display: block; }}
-        .three-rules {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }}
-        .rule-item {{ padding: 10px; border-radius: 8px; font-size: 12px; }}
-        .rule-pass {{ background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); }}
-        .rule-fail {{ background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); }}
-        .rule-item .icon {{ margin-right: 4px; }}
-        .rule-item .dim {{ color: var(--text-secondary); display: block; margin-top: 2px; }}
-        .reason-box {{
+        }
+        .topic-card.expanded .topic-detail { display: block; }
+        .three-rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
+        .rule-item { padding: 10px; border-radius: 8px; font-size: 12px; }
+        .rule-pass { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); }
+        .rule-fail { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); }
+        .rule-item .icon { margin-right: 4px; }
+        .rule-item .dim { color: var(--text-secondary); display: block; margin-top: 2px; }
+        .reason-box {
             background: rgba(99,102,241,0.08);
             border: 1px solid rgba(99,102,241,0.2);
             border-radius: 8px;
             padding: 14px;
             margin: 12px 0;
             font-size: 14px;
-        }}
-        .reason-box strong {{ color: #a5b4fc; }}
-        .source-tag {{ font-size: 11px; color: var(--text-secondary); margin-top: 8px; }}
-        .summary-section {{
+        }
+        .reason-box strong { color: #a5b4fc; }
+        .source-tag { font-size: 11px; color: var(--text-secondary); margin-top: 8px; }
+        .summary-section {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
-        }}
-        .summary-section h2 {{ font-size: 20px; margin-bottom: 16px; }}
-        .priority-list {{ list-style: none; }}
-        .priority-item {{
+        }
+        .summary-section h2 { font-size: 20px; margin-bottom: 16px; }
+        .priority-list { list-style: none; }
+        .priority-item {
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 8px;
@@ -189,19 +189,19 @@
             align-items: center;
             gap: 12px;
             font-size: 14px;
-        }}
-        .priority-item.p1 {{ background: rgba(231,76,60,0.1); border-left: 3px solid var(--must-write); }}
-        .priority-item.p2 {{ background: rgba(243,156,18,0.1); border-left: 3px solid var(--pending); }}
-        .priority-item.p3 {{ background: rgba(149,165,166,0.1); border-left: 3px solid var(--not-suit); }}
-        .priority-rank {{ font-weight: 800; font-size: 16px; min-width: 24px; }}
-        .priority-reason {{ color: var(--text-secondary); font-size: 12px; margin-top: 2px; }}
-        @media (max-width: 768px) {{
-            .stats-row {{ grid-template-columns: repeat(2, 1fr); }}
-            .three-rules {{ grid-template-columns: 1fr; }}
-            .filter-bar {{ flex-direction: column; align-items: flex-start; }}
-            .cat-filters {{ margin-left: 0; }}
-            .score-row {{ flex-direction: column; gap: 8px; }}
-        }}
+        }
+        .priority-item.p1 { background: rgba(231,76,60,0.1); border-left: 3px solid var(--must-write); }
+        .priority-item.p2 { background: rgba(243,156,18,0.1); border-left: 3px solid var(--pending); }
+        .priority-item.p3 { background: rgba(149,165,166,0.1); border-left: 3px solid var(--not-suit); }
+        .priority-rank { font-weight: 800; font-size: 16px; min-width: 24px; }
+        .priority-reason { color: var(--text-secondary); font-size: 12px; margin-top: 2px; }
+        @media (max-width: 768px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .three-rules { grid-template-columns: 1fr; }
+            .filter-bar { flex-direction: column; align-items: flex-start; }
+            .cat-filters { margin-left: 0; }
+            .score-row { flex-direction: column; gap: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -213,7 +213,7 @@
             <span class="meta-item">数据周期：2026-04-11 ~ 2026-04-18</span>
             <span class="meta-item">来源：选题情报 5 维度 + 每日资讯</span>
             <span class="meta-item">评估框架：AI深潜 / 认知显微镜 / 反常识工具箱</span>
-            <span class="meta-item">生成时间：2026-04-18 00:01</span>
+            <span class="meta-item">生成时间：2026-04-18 00:04</span>
         </div>
     </div>
     <div class="stats-row">
@@ -971,107 +971,107 @@ const topics = [
     "hot": false
   }
 ];
-function renderTopics(filteredTopics) {{
+function renderTopics(filteredTopics) {
     const grid = document.getElementById('topicsGrid');
     grid.innerHTML = '';
-    filteredTopics.sort((a, b) => {{
-        const statusOrder = {{ 'must': 0, 'pending': 1, 'not-suit': 2 }};
+    filteredTopics.sort((a, b) => {
+        const statusOrder = { 'must': 0, 'pending': 1, 'not-suit': 2 };
         if (statusOrder[a.status] !== statusOrder[b.status]) return statusOrder[a.status] - statusOrder[b.status];
         return b.total_score - a.total_score;
-    }});
-    filteredTopics.forEach(t => {{
+    });
+    filteredTopics.forEach(t => {
         const card = document.createElement('div');
-        card.className = `topic-card ${{t.status === 'must' ? 'must' : t.status === 'pending' ? 'pending' : 'not-suit'}}`;
+        card.className = `topic-card ${t.status === 'must' ? 'must' : t.status === 'pending' ? 'pending' : 'not-suit'}`;
         card.onclick = () => card.classList.toggle('expanded');
         const statusLabel = t.status === 'must' ? '必写' : t.status === 'pending' ? '待定' : '不适合';
         const statusBadge = t.status === 'must' ? 'badge-must' : t.status === 'pending' ? 'badge-pending' : 'badge-not';
         let scoreHTML = '';
-        for (const [dim, score] of Object.entries(t.scores)) {{
+        for (const [dim, score] of Object.entries(t.scores)) {
             const cls = score >= 8 ? 'high' : score >= 5 ? 'mid' : 'low';
-            scoreHTML += `<div class="score-item"><span>${{dim}}</span><div class="score-bar-bg"><div class="score-bar ${{cls}}" style="width:${{score*10}}%"></div></div><span>${{score}}</span></div>`;
-        }}
+            scoreHTML += `<div class="score-item"><span>${dim}</span><div class="score-bar-bg"><div class="score-bar ${cls}" style="width:${score*10}%"></div></div><span>${score}</span></div>`;
+        }
         const totalClass = t.total_score >= 8 ? 'high' : t.total_score >= 6 ? 'mid' : 'low';
         let rulesHTML = t.rules.map(r => `
-            <div class="rule-item ${{r.pass ? 'rule-pass' : 'rule-fail'}}">
-                <span class="icon">${{r.pass ? '✓' : '✗'}}</span>
-                <strong>${{r.name}}</strong>
-                <span class="dim">${{r.detail}}</span>
+            <div class="rule-item ${r.pass ? 'rule-pass' : 'rule-fail'}">
+                <span class="icon">${r.pass ? '✓' : '✗'}</span>
+                <strong>${r.name}</strong>
+                <span class="dim">${r.detail}</span>
             </div>
         `).join('');
         card.innerHTML = `
             <div class="topic-header">
-                <div class="topic-title">${{t.title}}</div>
+                <div class="topic-title">${t.title}</div>
                 <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
-                    <div class="total-score ${{totalClass}}">${{t.total_score.toFixed(1)}}</div>
+                    <div class="total-score ${totalClass}">${t.total_score.toFixed(1)}</div>
                 </div>
             </div>
             <div class="topic-badges">
-                <span class="badge ${{statusBadge}}">${{statusLabel}}</span>
-                <span class="badge badge-cat">${{t.category}}</span>
-                <span class="badge" style="background:rgba(255,255,255,0.05);color:var(--text-secondary);border:1px solid var(--card-border)">${{t.timing}}</span>
-                ${{t.hot ? '<span class="badge badge-hot">🔥 高热度</span>' : ''}}
+                <span class="badge ${statusBadge}">${statusLabel}</span>
+                <span class="badge badge-cat">${t.category}</span>
+                <span class="badge" style="background:rgba(255,255,255,0.05);color:var(--text-secondary);border:1px solid var(--card-border)">${t.timing}</span>
+                ${t.hot ? '<span class="badge badge-hot">🔥 高热度</span>' : ''}
             </div>
-            <div class="score-row">${{scoreHTML}}</div>
+            <div class="score-row">${scoreHTML}</div>
             <div class="topic-detail">
-                <div class="three-rules">${{rulesHTML}}</div>
-                <div class="reason-box"><strong>推荐理由：</strong>${{t.reason}}</div>
-                <div class="source-tag">📊 数据来源：${{t.source}}</div>
+                <div class="three-rules">${rulesHTML}</div>
+                <div class="reason-box"><strong>推荐理由：</strong>${t.reason}</div>
+                <div class="source-tag">📊 数据来源：${t.source}</div>
             </div>
         `;
         grid.appendChild(card);
-    }});
-}}
-function updateStats(filtered) {{
+    });
+}
+function updateStats(filtered) {
     document.getElementById('totalCount').textContent = filtered.length;
     document.getElementById('mustCount').textContent = filtered.filter(t => t.status === 'must').length;
     document.getElementById('pendingCount').textContent = filtered.filter(t => t.status === 'pending').length;
     document.getElementById('notCount').textContent = filtered.filter(t => t.status === 'not-suit').length;
-}}
-function renderPriority() {{
+}
+function renderPriority() {
     const mustTopics = topics.filter(t => t.status === 'must').sort((a, b) => b.total_score - a.total_score);
     const pendingTopics = topics.filter(t => t.status === 'pending').sort((a, b) => b.total_score - a.total_score);
     const notTopics = topics.filter(t => t.status === 'not-suit').sort((a, b) => b.total_score - a.total_score);
     const list = document.getElementById('priorityList');
     let html = '';
     html += '<h3 style="color:var(--must-write);margin:12px 0 8px;font-size:16px;">第一梯队：立刻写</h3>';
-    mustTopics.forEach((t, i) => {{
-        html += `<li class="priority-item p1"><span class="priority-rank" style="color:var(--must-write)">${{i+1}}</span><div><div>${{t.title}}</div><div class="priority-reason">${{t.category}} · ${{t.total_score.toFixed(1)}}分 · ${{t.timing}}</div></div></li>`;
-    }});
+    mustTopics.forEach((t, i) => {
+        html += `<li class="priority-item p1"><span class="priority-rank" style="color:var(--must-write)">${i+1}</span><div><div>${t.title}</div><div class="priority-reason">${t.category} · ${t.total_score.toFixed(1)}分 · ${t.timing}</div></div></li>`;
+    });
     html += '<h3 style="color:var(--pending);margin:20px 0 8px;font-size:16px;">第二梯队：本周内准备</h3>';
-    pendingTopics.filter(t => t.total_score >= 6.0).forEach((t, i) => {{
-        html += `<li class="priority-item p2"><span class="priority-rank" style="color:var(--pending)">${{i+1}}</span><div><div>${{t.title}}</div><div class="priority-reason">${{t.category}} · ${{t.total_score.toFixed(1)}}分 · ${{t.timing}}</div></div></li>`;
-    }});
+    pendingTopics.filter(t => t.total_score >= 6.0).forEach((t, i) => {
+        html += `<li class="priority-item p2"><span class="priority-rank" style="color:var(--pending)">${i+1}</span><div><div>${t.title}</div><div class="priority-reason">${t.category} · ${t.total_score.toFixed(1)}分 · ${t.timing}</div></div></li>`;
+    });
     html += '<h3 style="color:var(--not-suit);margin:20px 0 8px;font-size:16px;">建议暂不追</h3>';
-    notTopics.forEach((t, i) => {{
-        html += `<li class="priority-item p3"><span class="priority-rank" style="color:var(--not-suit)">${{i+1}}</span><div><div>${{t.title}}</div><div class="priority-reason">${{t.category}} · ${{t.total_score.toFixed(1)}}分 · ${{t.reason.slice(0, 40)}}...</div></div></li>`;
-    }});
+    notTopics.forEach((t, i) => {
+        html += `<li class="priority-item p3"><span class="priority-rank" style="color:var(--not-suit)">${i+1}</span><div><div>${t.title}</div><div class="priority-reason">${t.category} · ${t.total_score.toFixed(1)}分 · ${t.reason.slice(0, 40)}...</div></div></li>`;
+    });
     list.innerHTML = html;
-}}
+}
 let currentStatus = 'all';
 let currentCat = 'all';
-function applyFilters() {{
+function applyFilters() {
     let filtered = topics;
     if (currentStatus !== 'all') filtered = filtered.filter(t => t.status === currentStatus);
     if (currentCat !== 'all') filtered = filtered.filter(t => t.category === currentCat);
     renderTopics(filtered);
     updateStats(filtered);
-}}
-function filterByStatus(status, btn) {{
+}
+function filterByStatus(status, btn) {
     currentStatus = status;
-    document.querySelectorAll('.filter-bar > .filter-btn').forEach(b => {{ b.className = 'filter-btn'; }});
+    document.querySelectorAll('.filter-bar > .filter-btn').forEach(b => { b.className = 'filter-btn'; });
     if (status === 'must') btn.classList.add('active-must');
     else if (status === 'pending') btn.classList.add('active-pending');
     else if (status === 'not-suit') btn.classList.add('active-not');
     else btn.classList.add('active');
     applyFilters();
-}}
-function filterByCat(cat, btn) {{
+}
+function filterByCat(cat, btn) {
     currentCat = cat;
-    document.querySelectorAll('.cat-filters .filter-btn').forEach(b => {{ b.className = 'filter-btn'; }});
+    document.querySelectorAll('.cat-filters .filter-btn').forEach(b => { b.className = 'filter-btn'; });
     if (cat !== 'all') btn.classList.add('active-cat');
     else btn.classList.add('active');
     applyFilters();
-}}
+}
 renderPriority();
 applyFilters();
 </script>
