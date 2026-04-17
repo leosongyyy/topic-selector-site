@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选题情报台 - 远的AI学习圈</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --must-write: #e74c3c;
+            --pending: #f39c12;
+            --not-suit: #95a5a6;
+            --bg: #0f1117;
+            --card-bg: #1a1d28;
+            --card-border: #2a2d3a;
+            --text-primary: #e8e8ed;
+            --text-secondary: #9ca3af;
+            --accent: #6366f1;
+            --score-high: #10b981;
+            --score-mid: #f59e0b;
+            --score-low: #ef4444;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1d28 0%, #2a1d3a 100%);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .header h1 span { color: var(--accent); }
+        .header .meta {
+            display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap;
+        }
+        .meta-item {
+            background: rgba(99,102,241,0.15);
+            border: 1px solid rgba(99,102,241,0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #a5b4fc;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: 800;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .stat-must .number { color: var(--must-write); }
+        .stat-pending .number { color: var(--pending); }
+        .stat-not .number { color: var(--not-suit); }
+        .stat-total .number { color: var(--accent); }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-bar .label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-right: 4px;
+        }
+        .filter-btn {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+        .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        .filter-btn.active-must { background: var(--must-write); border-color: var(--must-write); color: white; }
+        .filter-btn.active-pending { background: var(--pending); border-color: var(--pending); color: white; }
+        .filter-btn.active-not { background: var(--not-suit); border-color: var(--not-suit); color: white; }
+        .filter-btn.active-cat { background: #06b6d4; border-color: #06b6d4; color: white; }
+
+        /* Category Filter */
+        .cat-filters {
+            display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap;
+        }
+
+        /* Topic Cards */
+        .topics-grid {
+            display: grid;
+            gap: 16px;
+        }
+        .topic-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .topic-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+        .topic-card.must::before { background: var(--must-write); }
+        .topic-card.pending::before { background: var(--pending); }
+        .topic-card.not-suit::before { background: var(--not-suit); }
+        .topic-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .topic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 16px;
+        }
+        .topic-title {
+            font-size: 17px;
+            font-weight: 600;
+            line-height: 1.4;
+            flex: 1;
+        }
+        .topic-badges {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .badge-must { background: rgba(231,76,60,0.2); color: #f87171; border: 1px solid rgba(231,76,60,0.3); }
+        .badge-pending { background: rgba(243,156,18,0.2); color: #fbbf24; border: 1px solid rgba(243,156,18,0.3); }
+        .badge-not { background: rgba(149,165,166,0.2); color: #bdc3c7; border: 1px solid rgba(149,165,166,0.3); }
+        .badge-cat {
+            background: rgba(6,182,212,0.15);
+            color: #67e8f9;
+            border: 1px solid rgba(6,182,212,0.3);
+        }
+        .badge-hot { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+
+        /* Score */
+        .score-row {
+            display: flex;
+            gap: 16px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+        .score-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .score-bar-bg {
+            width: 60px;
+            height: 6px;
+            background: #2a2d3a;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .score-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s;
+        }
+        .score-bar.high { background: var(--score-high); }
+        .score-bar.mid { background: var(--score-mid); }
+        .score-bar.low { background: var(--score-low); }
+        .total-score {
+            font-size: 20px;
+            font-weight: 800;
+            min-width: 52px;
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        .total-score.high { color: var(--score-high); background: rgba(16,185,129,0.1); }
+        .total-score.mid { color: var(--score-mid); background: rgba(245,158,11,0.1); }
+        .total-score.low { color: var(--score-low); background: rgba(239,68,68,0.1); }
+
+        /* Detail Section */
+        .topic-detail {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--card-border);
+        }
+        .topic-card.expanded .topic-detail { display: block; }
+
+        .three-rules {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .rule-item {
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        .rule-pass { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); }
+        .rule-fail { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); }
+        .rule-item .icon { margin-right: 4px; }
+        .rule-item .dim { color: var(--text-secondary); display: block; margin-top: 2px; }
+
+        .reason-box {
+            background: rgba(99,102,241,0.08);
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: 8px;
+            padding: 14px;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+        .reason-box strong { color: #a5b4fc; }
+
+        .source-tag {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .summary-section h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+        .priority-list {
+            list-style: none;
+        }
+        .priority-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+        .priority-item.p1 { background: rgba(231,76,60,0.1); border-left: 3px solid var(--must-write); }
+        .priority-item.p2 { background: rgba(243,156,18,0.1); border-left: 3px solid var(--pending); }
+        .priority-item.p3 { background: rgba(149,165,166,0.1); border-left: 3px solid var(--not-suit); }
+        .priority-rank {
+            font-weight: 800;
+            font-size: 16px;
+            min-width: 24px;
+        }
+        .priority-reason {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .three-rules { grid-template-columns: 1fr; }
+            .filter-bar { flex-direction: column; align-items: flex-start; }
+            .cat-filters { margin-left: 0; }
+            .score-row { flex-direction: column; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <h1>选题<span>情报台</span></h1>
+        <p style="color: var(--text-secondary); font-size: 15px;">基于选题情报系统 + 每日资讯，按「远的学习圈」三栏定位框架评估</p>
+        <div class="meta">
+            <span class="meta-item">数据周期：2026-04-14 ~ 2026-04-17</span>
+            <span class="meta-item">来源：选题情报 5 维度 + 每日资讯</span>
+            <span class="meta-item">评估框架：AI深潜 / 认知显微镜 / 反常识工具箱</span>
+            <span class="meta-item">生成时间：2026-04-17 23:20</span>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-card stat-total">
+            <div class="number" id="totalCount">0</div>
+            <div class="label">总候选选题</div>
+        </div>
+        <div class="stat-card stat-must">
+            <div class="number" id="mustCount">0</div>
+            <div class="label">必写</div>
+        </div>
+        <div class="stat-card stat-pending">
+            <div class="number" id="pendingCount">0</div>
+            <div class="label">待定</div>
+        </div>
+        <div class="stat-card stat-not">
+            <div class="number" id="notCount">0</div>
+            <div class="label">不适合</div>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-section">
+        <h2>发布优先级建议</h2>
+        <ul class="priority-list" id="priorityList"></ul>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+        <span class="label">筛选：</span>
+        <button class="filter-btn active" onclick="filterByStatus('all', this)">全部</button>
+        <button class="filter-btn" onclick="filterByStatus('must', this)">必写</button>
+        <button class="filter-btn" onclick="filterByStatus('pending', this)">待定</button>
+        <button class="filter-btn" onclick="filterByStatus('not-suit', this)">不适合</button>
+        <div class="cat-filters">
+            <span class="label">栏目：</span>
+            <button class="filter-btn" onclick="filterByCat('all', this)">全部</button>
+            <button class="filter-btn" onclick="filterByCat('AI深潜', this)">AI深潜</button>
+            <button class="filter-btn" onclick="filterByCat('认知显微镜', this)">认知显微镜</button>
+            <button class="filter-btn" onclick="filterByCat('反常识工具箱', this)">反常识工具箱</button>
+        </div>
+    </div>
+
+    <!-- Topics Grid -->
+    <div class="topics-grid" id="topicsGrid"></div>
+
+</div>
+
+<script>
+const topics = [
+    {
+        id: 1,
+        title: "AI情绪树洞的解药与毒药——56%的年轻人选择向AI倾诉，芬兰研究揭示长期陪伴正在悄悄损伤心理健康",
+        status: "must",
+        category: "认知显微镜",
+        timing: "热点型（需3天内）",
+        scores: { "反常识程度": 9, "原理可讲性": 9, "传播冲动": 10, "栏目匹配度": 10, "时效性价值": 9 },
+        totalScore: 9.3,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "AI'解药'恰好是'毒药'——越完美的陪伴越让人无法接受真实关系" },
+            { pass: true, name: "原理可讲", detail: "依恋理论+替代性满足+情绪阈值机制，神经科学依据充分" },
+            { pass: true, name: "栏目归属", detail: "完美归入「认知显微镜」——AI×人脑情感系统的共同机制" }
+        ],
+        reason: "腾讯56%数据+芬兰阿尔托研究+五部门7月立法，三个锚点构成「现象爆发→科学验证→政策响应」的完整叙事闭环。反常识张力极强：AI解决了孤独却制造了更深的孤独。",
+        source: "社会现象 04-17 + 认知冲突数据 04-17 + 索引汇总 04-17",
+        hot: true
+    },
+    {
+        id: 2,
+        title: "44%的Z世代员工正在亲手毁掉公司的AI计划——越担心被AI取代的人越抵制AI",
+        status: "must",
+        category: "反常识工具箱",
+        timing: "热点型（需5天内）",
+        scores: { "反常识程度": 9, "原理可讲性": 8, "传播冲动": 9, "栏目匹配度": 9, "时效性价值": 8 },
+        totalScore: 8.6,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "最懂科技的一代最抵制科技——抵抗行为反而在加速自身被裁" },
+            { pass: true, name: "原理可讲", detail: "战斗-逃跑本能+囚徒困境+个体理性导致集体非理性" },
+            { pass: true, name: "栏目归属", detail: "归入「反常识工具箱」——流行观念（抵制AI能保住工作）被实证否定" }
+        ],
+        reason: "Writer×Workplace Intelligence 44%数据极具冲击力。这不是代际问题，是普遍的人类心理问题——但Z世代正在为此付出最大代价（60%高管优先裁掉拒用AI者）。职场群体共鸣度极高。",
+        source: "社会现象 04-17 + 索引汇总 04-16",
+        hot: true
+    },
+    {
+        id: 3,
+        title: "DeepSeek V4发布在即——国产大模型+国产芯片「双国产」突围，API定价$0.3/百万Token",
+        status: "must",
+        category: "AI深潜",
+        timing: "热点型（待发布即刻跟进）",
+        scores: { "反常识程度": 7, "原理可讲性": 8, "传播冲动": 8, "栏目匹配度": 9, "时效性价值": 10 },
+        totalScore: 8.2,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "美国封锁反而催化中国AI全栈自主——从模型到芯片的完整闭环" },
+            { pass: true, name: "原理可讲", detail: "CUDA→CANN迁移的技术路径+万亿参数架构+昇腾适配策略" },
+            { pass: true, name: "栏目归属", detail: "完美归入「AI深潜」——具体模型+数据支撑+技术机制分析" }
+        ],
+        reason: "DeepSeek V4定档4月下旬，时效窗口即将打开。万亿参数+昇腾950PR适配+$0.3定价，三重数据点构成'技术突破+地缘博弈+普惠定价'的复合叙事。",
+        source: "AI大厂动态 04-17 + 索引汇总 04-17",
+        hot: true
+    },
+    {
+        id: 4,
+        title: "Anthropic的尴尬48小时——Claude Mythos「太危险」拒绝发布，Claude 4月15日全球大宕机",
+        status: "must",
+        category: "AI深潜",
+        timing: "热点型（时效窗已过半）",
+        scores: { "反常识程度": 9, "原理可讲性": 7, "传播冲动": 9, "栏目匹配度": 8, "时效性价值": 7 },
+        totalScore: 8.0,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "AI太强了所以不能给你用——但已有的AI连稳定运行都保证不了" },
+            { pass: true, name: "原理可讲", detail: "安全沙箱突破+模型能力边界+基础设施可靠性三角悖论" },
+            { pass: true, name: "栏目归属", detail: "归入「AI深潜」——AI安全与能力边界的具体事件+机制分析" }
+        ],
+        reason: "「能力悖论」叙事天然具备传播力：站在巅峰不敢发布，已有服务全线崩溃。WallStreet+美联储+千亿市值蒸发，事件体量足够支撑深度文章。",
+        source: "AI大厂动态 04-17 + 索引汇总 04-16",
+        hot: true
+    },
+    {
+        id: 5,
+        title: "GPT-6正式发布——代号「土豆」，200万Token上下文+Symphony原生多模态架构",
+        status: "must",
+        category: "AI深潜",
+        timing: "热点型（需本周内）",
+        scores: { "反常识程度": 6, "原理可讲性": 8, "传播冲动": 8, "栏目匹配度": 9, "时效性价值": 9 },
+        totalScore: 7.8,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "200万Token≠写长文，而是'读完一本书再跟你聊'的能力跃迁" },
+            { pass: true, name: "原理可讲", detail: "长上下文的技术含义+Symphony架构+对普通人的真实影响" },
+            { pass: true, name: "栏目归属", detail: "归入「AI深潜」——具体模型发布+技术机制+实际影响分析" }
+        ],
+        reason: "OpenAI耗资20亿、耗时18个月的旗舰产品。差异化角度：聚焦200万Token对普通人的实际意义，而非参数堆砌。与DeepSeek V4的价格对比有实用价值。",
+        source: "AI大厂动态 04-16 + 索引汇总 04-16"
+    },
+    {
+        id: 6,
+        title: "五部门出台AI拟人化互动监管新规——全球首批AI情感陪伴专项法规，7月15日施行",
+        status: "pending",
+        category: "认知显微镜",
+        timing: "储备型",
+        scores: { "反常识程度": 6, "原理可讲性": 7, "传播冲动": 6, "栏目匹配度": 7, "时效性价值": 8 },
+        totalScore: 6.8,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "AI通过消除不确定性制造了依赖陷阱——完美关系恰恰是最危险的" },
+            { pass: true, name: "原理可讲", detail: "情感操控机制+依恋理论+政策逻辑链条" },
+            { pass: true, name: "栏目归属", detail: "可归入「认知显微镜」——人脑情感系统被技术重新编码" }
+        ],
+        reason: "监管解读本身传播性有限，但作为AI情感陪伴系列文章的「政策篇」有支撑价值。建议与选题#1合并为上下篇。",
+        source: "社会现象 04-17 + AI大厂动态 04-17"
+    },
+    {
+        id: 7,
+        title: "斯坦福AI指数报告——专家越乐观、公众越焦虑，认知鸿沟背后是叙事权之争",
+        status: "pending",
+        category: "认知显微镜",
+        timing: "储备型",
+        scores: { "反常识程度": 7, "原理可讲性": 7, "传播冲动": 5, "栏目匹配度": 8, "时效性价值": 6 },
+        totalScore: 6.5,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "懂AI的人越乐观、不懂的人越焦虑——他们评估的根本不是同一个'AI'" },
+            { pass: true, name: "原理可讲", detail: "乐观偏见+可得性启发式偏差+利益分配不对称性" },
+            { pass: true, name: "栏目归属", detail: "可归入「认知显微镜」——认知偏差×AI信息处理" }
+        ],
+        reason: "学术性强，大众传播性稍弱。但报告质量极高（斯坦福+36国数据），适合做深度分析。建议等待更合适的切入时机，或与AI情绪树洞选题联动。",
+        source: "社会现象 04-15 + 认知冲突数据 04-17"
+    },
+    {
+        id: 8,
+        title: "Claude Code Token暴增Bug——配额一天烧光，手动修复攻略让消耗减少20倍",
+        status: "pending",
+        category: "AI深潜",
+        timing: "热点型（时效窗已过）",
+        scores: { "反常识程度": 5, "原理可讲性": 7, "传播冲动": 7, "栏目匹配度": 6, "时效性价值": 5 },
+        totalScore: 5.8,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "Claude无法区分用户输入和自身输出，跨越多个模型的'AI归因Bug'" },
+            { pass: true, name: "原理可讲", detail: "Prompt Cache TTL+字符串缓存机制+Token计费逻辑" },
+            { pass: false, name: "栏目归属", detail: "偏向工具评测/避坑指南，不完全契合三栏定位" }
+        ],
+        reason: "实用价值高但偏「工具避坑」风格，不完全契合公众号定位。可考虑以「AI工具的信任危机」为角度重新包装。",
+        source: "工具实测翻车 04-17"
+    },
+    {
+        id: 9,
+        title: "AI大模型集体涨价——即梦涨8倍、火山引擎涨463%、阿里云4月18日起涨价",
+        status: "pending",
+        category: "AI深潜",
+        timing: "热点型",
+        scores: { "反常识程度": 5, "原理可讲性": 6, "传播冲动": 7, "栏目匹配度": 5, "时效性价值": 8 },
+        totalScore: 5.8,
+        rules: [
+            { pass: false, name: "反常识结论", detail: "涨价是预期之内的事，缺乏真正的反常识洞察" },
+            { pass: true, name: "原理可讲", detail: "算力成本传导+行业逻辑从烧钱换规模到盈利换可持续" },
+            { pass: false, name: "栏目归属", detail: "偏价格对比/消费指南，不完全契合三栏定位" }
+        ],
+        reason: "覆盖面广但角度偏浅。需要找到反常识角度（如：为什么涨价反而是行业走向健康的信号？）才能适配三栏框架。",
+        source: "工具实测翻车 04-17 + 选题情报 04-14"
+    },
+    {
+        id: 10,
+        title: "Google Gemini Robotics-ER 1.6——具身智能再突破，工业任务成功率飙升300%",
+        status: "pending",
+        category: "AI深潜",
+        timing: "储备型",
+        scores: { "反常识程度": 5, "原理可讲性": 7, "传播冲动": 4, "栏目匹配度": 7, "时效性价值": 5 },
+        totalScore: 5.4,
+        rules: [
+            { pass: false, name: "反常识结论", detail: "具身智能进步是预期方向，缺乏认知冲突" },
+            { pass: true, name: "原理可讲", detail: "具身推理+物理世界感知+工业应用场景" },
+            { pass: true, name: "栏目归属", detail: "可归入「AI深潜」——具体模型+技术机制分析" }
+        ],
+        reason: "技术含量高但大众传播性偏弱。具身智能目前更多是行业话题，距离普通读者较远。建议等待更贴近生活的落地场景再切入。",
+        source: "AI大厂动态 04-17"
+    },
+    {
+        id: 11,
+        title: "中国AI周调用量12.96万亿Token，连续五周超越美国——但高学历人群反成AI最大受害者",
+        status: "pending",
+        category: "反常识工具箱",
+        timing: "储备型",
+        scores: { "反常识程度": 8, "原理可讲性": 6, "传播冲动": 6, "栏目匹配度": 7, "时效性价值": 5 },
+        totalScore: 6.2,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "AI用得越多越受益？不——高学历者研究生占比从4.5%跃升至17.4%" },
+            { pass: true, name: "原理可讲", detail: "任务标准化程度+替代成本结构+马太效应" },
+            { pass: true, name: "栏目归属", detail: "可归入「反常识工具箱」——AI受益者 vs 受害者的真实分化" }
+        ],
+        reason: "认知冲突点极佳（中国调用量碾压美国+高学历反成最大受害者），但数据分散，需要整合多篇来源。建议与其他AI就业选题合并为一篇综合分析。",
+        source: "认知冲突数据 04-17 + 选题情报 04-14"
+    },
+    {
+        id: 12,
+        title: "MIT研究：AI「上瘾」使用者大脑萎缩47%——你的大脑正在被AI「吃掉」",
+        status: "pending",
+        category: "认知显微镜",
+        timing: "储备型",
+        scores: { "反常识程度": 9, "原理可讲性": 6, "传播冲动": 8, "栏目匹配度": 8, "时效性价值": 4 },
+        totalScore: 6.6,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "47%大脑萎缩——AI在帮你思考的同时，正在偷走你的思考能力" },
+            { pass: true, name: "原理可讲", detail: "认知卸载+EEG神经证据+深度理解vs表面化" },
+            { pass: true, name: "栏目归属", detail: "完美归入「认知显微镜」——AI×人脑神经机制" }
+        ],
+        reason: "47%数据极具冲击力，但研究来源为MIT 2025年9月，时效性下降。且「大脑萎缩47%」这一数字需要核实是否被媒体放大。建议谨慎引用原始论文。",
+        source: "认知冲突数据 04-17"
+    },
+    {
+        id: 13,
+        title: "AI越错越自信——错误时使用'definitely''certainly'的概率高出34%",
+        status: "pending",
+        category: "反常识工具箱",
+        timing: "储备型",
+        scores: { "反常识程度": 8, "原理可讲性": 6, "传播冲动": 7, "栏目匹配度": 7, "时效性价值": 5 },
+        totalScore: 6.4,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "AI犯错时反而更自信——信任AI的判断可能比不信任更危险" },
+            { pass: true, name: "原理可讲", detail: "LLM生成机制+置信度校准偏差+人类过度信任偏差" },
+            { pass: true, name: "栏目归属", detail: "可归入「反常识工具箱」——流行观念'AI很靠谱'被实证否定" }
+        ],
+        reason: "认知冲突点好，适合做短篇或与其他认知偏差选题合并。单独支撑长文素材稍显不足。",
+        source: "认知冲突数据 04-14 + 认知冲突数据 04-17"
+    },
+    {
+        id: 14,
+        title: "阿里千问AI眼镜全球首店开业vs字节豆包AI眼镜项目整体延后——AI硬件的冰与火",
+        status: "not-suit",
+        category: "AI深潜",
+        timing: "热点型",
+        scores: { "反常识程度": 4, "原理可讲性": 4, "传播冲动": 5, "栏目匹配度": 5, "时效性价值": 7 },
+        totalScore: 4.8,
+        rules: [
+            { pass: false, name: "反常识结论", detail: "大厂策略分化是常态，缺乏反常识张力" },
+            { pass: false, name: "原理可讲", detail: "偏商业策略分析，技术/认知机制层面可讲性不足" },
+            { pass: false, name: "栏目归属", detail: "偏向行业观察/商业评论，不完全契合三栏定位" }
+        ],
+        reason: "有新闻价值但缺乏深度分析空间，更适合科技资讯媒体（差评X.PIN风格）而非公众号深度文章。",
+        source: "AI大厂动态 04-17"
+    },
+    {
+        id: 15,
+        title: "AI Agent正在「打破」互联网——GitHub Actions消耗暴涨，1700万次AI PR",
+        status: "not-suit",
+        category: "AI深潜",
+        timing: "储备型",
+        scores: { "反常识程度": 5, "原理可讲性": 5, "传播冲动": 4, "栏目匹配度": 4, "时效性价值": 5 },
+        totalScore: 4.4,
+        rules: [
+            { pass: false, name: "反常识结论", detail: "Agent增长是趋势而非反常识" },
+            { pass: false, name: "原理可讲", detail: "偏基础设施话题，缺乏认知/机制分析空间" },
+            { pass: false, name: "栏目归属", detail: "开发者向话题，大众读者参与度低" }
+        ],
+        reason: "开发者向话题，目标受众偏窄。适合技术博客或开发者社区，不太适配公众号定位。",
+        source: "工具实测翻车 04-17"
+    },
+    {
+        id: 16,
+        title: "Cursor Composer 2套壳Kimi——硅谷最当红AI编程工具的「自研」标签被撕下",
+        status: "not-suit",
+        category: "AI深潜",
+        timing: "热点型（时效窗已过）",
+        scores: { "反常识程度": 6, "原理可讲性": 4, "传播冲动": 6, "栏目匹配度": 3, "时效性价值": 3 },
+        totalScore: 4.2,
+        rules: [
+            { pass: true, name: "反常识结论", detail: "顶流AI工具底层全是中文代码——'自研'标签的崩塌" },
+            { pass: false, name: "原理可讲", detail: "偏八卦+行业揭秘，缺乏技术/认知层面的深度机制" },
+            { pass: false, name: "栏目归属", detail: "偏向行业八卦，不适合三栏定位" }
+        ],
+        reason: "有传播力但偏「行业八卦」风格，与公众号定位不符。时效窗已过（3月事件），不建议追。",
+        source: "工具实测翻车 04-17"
+    },
+    {
+        id: 17,
+        title: "AI代笔封号潮——微信平台专项整治，'年入200万AI写作夫妻'被封号",
+        status: "not-suit",
+        category: "AI深潜",
+        timing: "热点型（时效窗已过）",
+        scores: { "反常识程度": 5, "原理可讲性": 3, "传播冲动": 6, "栏目匹配度": 3, "时效性价值": 3 },
+        totalScore: 3.8,
+        rules: [
+            { pass: false, name: "反常识结论", detail: "AI代写被封是预期之内" },
+            { pass: false, name: "原理可讲", detail: "偏行业动态+平台政策解读" },
+            { pass: false, name: "栏目归属", detail: "不属于三栏任一" }
+        ],
+        reason: "行业话题，与公众号「AI科技深度+认知科学」的定位偏离较大。更适合自媒体运营类账号。",
+        source: "工具实测翻车 04-15"
+    },
+    {
+        id: 18,
+        title: "Google发布Gemini 3.1 Flash TTS——近70种语言+SynthID水印",
+        status: "not-suit",
+        category: "AI深潜",
+        timing: "储备型",
+        scores: { "反常识程度": 3, "原理可讲性": 5, "传播冲动": 3, "栏目匹配度": 4, "时效性价值": 5 },
+        totalScore: 3.6,
+        rules: [
+            { pass: false, name: "反常识结论", detail: "语音合成进步是预期方向" },
+            { pass: false, name: "原理可讲", detail: "偏产品发布报道" },
+            { pass: false, name: "栏目归属", detail: "不契合三栏定位" }
+        ],
+        reason: "标准产品发布，缺乏深度分析空间和反常识角度。",
+        source: "AI大厂动态 04-17"
+    },
+    {
+        id: 19,
+        title: "腾讯混元3D世界模型2.0开源发布+《AI趋势研究白皮书2026Q1》",
+        status: "not-suit",
+        category: "AI深潜",
+        timing: "储备型",
+        scores: { "反常识程度": 3, "原理可讲性": 5, "传播冲动": 3, "栏目匹配度": 4, "时效性价值": 5 },
+        totalScore: 3.6,
+        rules: [
+            { pass: false, name: "反常识结论", detail: "开源是行业趋势，非反常识" },
+            { pass: false, name: "原理可讲", detail: "偏产品/行业动态" },
+            { pass: false, name: "栏目归属", detail: "不契合三栏定位" }
+        ],
+        reason: "行业动态型新闻，缺乏深度分析角度。更适合资讯类媒体报道。",
+        source: "AI大厂动态 04-17"
+    },
+    {
+        id: 20,
+        title: "MiniMax上线MaxHermes云端沙箱——AI技能自主进化",
+        status: "not-suit",
+        category: "AI深潜",
+        timing: "储备型",
+        scores: { "反常识程度": 3, "原理可讲性": 4, "传播冲动": 2, "栏目匹配度": 3, "时效性价值": 4 },
+        totalScore: 3.0,
+        rules: [
+            { pass: false, name: "反常识结论", detail: "Agent进化是预期方向" },
+            { pass: false, name: "原理可讲", detail: "偏行业产品动态" },
+            { pass: false, name: "栏目归属", detail: "不契合三栏定位" }
+        ],
+        reason: "行业产品发布，受众极窄（AI Agent开发者），不适合公众号文章。",
+        source: "AI大厂动态 04-17"
+    }
+];
+
+// Render
+function renderTopics(filteredTopics) {
+    const grid = document.getElementById('topicsGrid');
+    grid.innerHTML = '';
+
+    filteredTopics.sort((a, b) => {
+        const statusOrder = { 'must': 0, 'pending': 1, 'not-suit': 2 };
+        if (statusOrder[a.status] !== statusOrder[b.status]) return statusOrder[a.status] - statusOrder[b.status];
+        return b.totalScore - a.totalScore;
+    });
+
+    filteredTopics.forEach(t => {
+        const card = document.createElement('div');
+        card.className = `topic-card ${t.status === 'must' ? 'must' : t.status === 'pending' ? 'pending' : 'not-suit'}`;
+        card.onclick = () => card.classList.toggle('expanded');
+
+        const statusLabel = t.status === 'must' ? '必写' : t.status === 'pending' ? '待定' : '不适合';
+        const statusBadge = t.status === 'must' ? 'badge-must' : t.status === 'pending' ? 'badge-pending' : 'badge-not';
+
+        let scoreHTML = '';
+        for (const [dim, score] of Object.entries(t.scores)) {
+            const cls = score >= 8 ? 'high' : score >= 5 ? 'mid' : 'low';
+            scoreHTML += `<div class="score-item"><span>${dim}</span><div class="score-bar-bg"><div class="score-bar ${cls}" style="width:${score*10}%"></div></div><span>${score}</span></div>`;
+        }
+
+        const totalClass = t.totalScore >= 8 ? 'high' : t.totalScore >= 6 ? 'mid' : 'low';
+
+        let rulesHTML = t.rules.map(r => `
+            <div class="rule-item ${r.pass ? 'rule-pass' : 'rule-fail'}">
+                <span class="icon">${r.pass ? '✓' : '✗'}</span>
+                <strong>${r.name}</strong>
+                <span class="dim">${r.detail}</span>
+            </div>
+        `).join('');
+
+        card.innerHTML = `
+            <div class="topic-header">
+                <div class="topic-title">${t.title}</div>
+                <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+                    <div class="total-score ${totalClass}">${t.totalScore.toFixed(1)}</div>
+                </div>
+            </div>
+            <div class="topic-badges">
+                <span class="badge ${statusBadge}">${statusLabel}</span>
+                <span class="badge badge-cat">${t.category}</span>
+                <span class="badge" style="background:rgba(255,255,255,0.05);color:var(--text-secondary);border:1px solid var(--card-border)">${t.timing}</span>
+                ${t.hot ? '<span class="badge badge-hot">🔥 高热度</span>' : ''}
+            </div>
+            <div class="score-row">${scoreHTML}</div>
+            <div class="topic-detail">
+                <div class="three-rules">${rulesHTML}</div>
+                <div class="reason-box"><strong>推荐理由：</strong>${t.reason}</div>
+                <div class="source-tag">📊 数据来源：${t.source}</div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// Stats
+function updateStats(filtered) {
+    document.getElementById('totalCount').textContent = filtered.length;
+    document.getElementById('mustCount').textContent = filtered.filter(t => t.status === 'must').length;
+    document.getElementById('pendingCount').textContent = filtered.filter(t => t.status === 'pending').length;
+    document.getElementById('notCount').textContent = filtered.filter(t => t.status === 'not-suit').length;
+}
+
+// Priority
+function renderPriority() {
+    const mustTopics = topics.filter(t => t.status === 'must').sort((a, b) => b.totalScore - a.totalScore);
+    const pendingTopics = topics.filter(t => t.status === 'pending').sort((a, b) => b.totalScore - a.totalScore);
+    const notTopics = topics.filter(t => t.status === 'not-suit').sort((a, b) => b.totalScore - a.totalScore);
+
+    const list = document.getElementById('priorityList');
+    let html = '';
+
+    html += '<h3 style="color:var(--must-write);margin:12px 0 8px;font-size:16px;">第一梯队：立刻写</h3>';
+    mustTopics.forEach((t, i) => {
+        html += `<li class="priority-item p1"><span class="priority-rank" style="color:var(--must-write)">${i+1}</span><div><div>${t.title}</div><div class="priority-reason">${t.category} · ${t.totalScore.toFixed(1)}分 · ${t.timing}</div></div></li>`;
+    });
+
+    html += '<h3 style="color:var(--pending);margin:20px 0 8px;font-size:16px;">第二梯队：本周内准备</h3>';
+    pendingTopics.filter(t => t.totalScore >= 6.0).forEach((t, i) => {
+        html += `<li class="priority-item p2"><span class="priority-rank" style="color:var(--pending)">${i+1}</span><div><div>${t.title}</div><div class="priority-reason">${t.category} · ${t.totalScore.toFixed(1)}分 · ${t.timing}</div></div></li>`;
+    });
+
+    html += '<h3 style="color:var(--not-suit);margin:20px 0 8px;font-size:16px;">建议暂不追</h3>';
+    notTopics.forEach((t, i) => {
+        html += `<li class="priority-item p3"><span class="priority-rank" style="color:var(--not-suit)">${i+1}</span><div><div>${t.title}</div><div class="priority-reason">${t.category} · ${t.totalScore.toFixed(1)}分 · ${t.reason.slice(0, 40)}...</div></div></li>`;
+    });
+
+    list.innerHTML = html;
+}
+
+// Filters
+let currentStatus = 'all';
+let currentCat = 'all';
+
+function applyFilters() {
+    let filtered = topics;
+    if (currentStatus !== 'all') filtered = filtered.filter(t => t.status === currentStatus);
+    if (currentCat !== 'all') filtered = filtered.filter(t => t.category === currentCat);
+    renderTopics(filtered);
+    updateStats(filtered);
+}
+
+function filterByStatus(status, btn) {
+    currentStatus = status;
+    document.querySelectorAll('.filter-bar > .filter-btn').forEach(b => {
+        b.className = 'filter-btn';
+    });
+    if (status === 'must') btn.classList.add('active-must');
+    else if (status === 'pending') btn.classList.add('active-pending');
+    else if (status === 'not-suit') btn.classList.add('active-not');
+    else btn.classList.add('active');
+    applyFilters();
+}
+
+function filterByCat(cat, btn) {
+    currentCat = cat;
+    document.querySelectorAll('.cat-filters .filter-btn').forEach(b => {
+        b.className = 'filter-btn';
+    });
+    if (cat !== 'all') btn.classList.add('active-cat');
+    else btn.classList.add('active');
+    applyFilters();
+}
+
+// Init
+renderPriority();
+applyFilters();
+</script>
+</body>
+</html>
